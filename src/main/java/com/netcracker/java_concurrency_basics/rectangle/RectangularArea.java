@@ -1,34 +1,43 @@
 package com.netcracker.java_concurrency_basics.rectangle;
 
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * Rectangular area in a coordinate space,
  * specified by a top left point, its width, height and name.
  */
 public class RectangularArea {
-    private String name;
-    private Point topLeft;
+    private volatile String name;
+    private final Point topLeft;
     private int width;
-    private int height;
+    private int height; // union this variable and return in getter only copy
+    private final Object lock = new Object();
 
     public RectangularArea(String s, Point p, int w, int h) {
+        Objects.requireNonNull(p);
         name = s;
-        topLeft = p;
+        topLeft = new Point(p);
         width = w;
         height = h;
     }
 
     public int getHeight() {
-        return height;
+        synchronized (lock) {
+            return height;
+        }
     }
 
     public int getWidth() {
-        return width;
+        synchronized (lock) {
+            return width;
+        }
     }
 
     public Point getLocation() {
-        return topLeft;
+        synchronized (topLeft) {
+            return new Point(topLeft);
+        }
     }
 
     public String getName() {
@@ -36,13 +45,17 @@ public class RectangularArea {
     }
 
     public void resize(int factor) {
-        width *= factor;
-        height *= factor;
+        synchronized (lock) {
+            width *= factor;
+            height *= factor;
+        }
     }
 
     public void translate(Point p) {
-        topLeft.x += p.x;
-        topLeft.y += p.y;
+        synchronized (topLeft) {
+            topLeft.x += p.x;
+            topLeft.y += p.y;
+        }
     }
 
     public void rename(String s) {
