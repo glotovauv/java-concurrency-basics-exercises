@@ -1,28 +1,32 @@
 package com.netcracker.java_concurrency_basics.semaphore;
 
-import java.util.ArrayList;
-import java.util.List;
-
 class Semaphore {
     private final int permits;
     private int count = 0;
+    private final Object lock = new Object();
 
     public Semaphore(int permits) {
         this.permits = permits;
     }
 
-    public synchronized void acquire() throws InterruptedException {
-        while (count == permits) {
-            wait();
+    public void acquire() throws InterruptedException {
+        synchronized (lock) {
+            while (count == permits) {
+                lock.wait();
+            }
+            count++;
+            System.out.println("acquire - " + count);
         }
-        count++;
-        System.out.println("acquire - " + count);
     }
 
-    public synchronized void release() {
-        count--;
-        System.out.println("release - " + count);
-        notifyAll();
+    public void release() {
+        synchronized(lock) {
+            if (count > 0) {
+                count--;
+                System.out.println("release - " + count);
+                lock.notify();
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -44,13 +48,8 @@ class Semaphore {
             }
         };
 
-        List<Thread> threads = new ArrayList<>(10);
         for (int i = 0; i < 10; i++) {
-            threads.add(new Thread(runnable, "thread-" + i));
-        }
-
-        for (Thread thread : threads) {
-            thread.start();
+            new Thread(runnable, "thread-" + i).start();
         }
     }
 }
