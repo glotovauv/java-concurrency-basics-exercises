@@ -1,7 +1,5 @@
 package com.netcracker.java_concurrency_basics.producer_consumer;
 
-import java.util.Random;
-
 class Producer {
     private final Queue<String> queue;
     private final int id;

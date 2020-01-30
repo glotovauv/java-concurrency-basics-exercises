@@ -31,10 +31,12 @@ public class Launcher {
             consumer.start();
         }
 
-        consumers.forEach(Consumer::shutdown);
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            consumers.forEach(Consumer::shutdown);
+            producers.forEach(Producer::shutdown);
 
-        Thread.sleep(100);
-
-        producers.forEach(Producer::shutdown);
+            //finish without waiting shutdown consumers and producers
+            System.out.println("shutdown hook");
+        }));
     }
 }
