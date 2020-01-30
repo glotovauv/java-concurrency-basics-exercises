@@ -17,17 +17,26 @@ class Consumer {
 
     private void doJob() {
         while (true) {
+            if(Thread.currentThread().isInterrupted()) {
+                System.out.println("CONS" + id + " stopped");
+                break;
+            }
             try {
                 String msg = queue.take();
                 System.out.println("CONS" + id + " received message: " + msg);
                 //Thread.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (InterruptedException e) {
+                System.out.println("Interrupt consumer " + "CONS" + id);
+                t.interrupt();
             }
         }
     }
 
     void start() {
         t.start();
+    }
+
+    void shutdown() {
+        t.interrupt();
     }
 }

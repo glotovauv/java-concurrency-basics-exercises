@@ -21,18 +21,27 @@ class Producer {
 
     private void doJob() {
         for (int i = 0; i < msgNum; i++) {
+            if(Thread.currentThread().isInterrupted()) {
+                System.out.println("PROD" + id + " stopped");
+                break;
+            }
             String msg = "PROD" + id + "-" + i;
             try {
                 queue.offer(msg);
                 System.out.println("Sent message: " + msg);
                 Thread.sleep(30);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (InterruptedException e) {
+                System.out.println("Interrupt producer " + "PROD" + id);
+                t.interrupt();
             }
         }
     }
 
     void start() {
        t.start();
+    }
+
+    void shutdown() {
+        t.interrupt();
     }
 }

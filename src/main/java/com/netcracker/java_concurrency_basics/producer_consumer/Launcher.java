@@ -8,8 +8,8 @@ public class Launcher {
     private static final int PRODUCER_NUM = 3;
     private static final int MSG_NUM = 100;
 
-    public static void main(String[] args) {
-        Queue<String> queue = new Queue<>(MSG_NUM);
+    public static void main(String[] args) throws InterruptedException {
+        Queue<String> queue = new Queue<>(300);
 
         List<Consumer> consumers = new ArrayList<>(CONSUMERS_NUM);
 
@@ -31,7 +31,10 @@ public class Launcher {
             consumer.start();
         }
 
+        consumers.forEach(Consumer::shutdown);
 
-        // No shutdown is needed.
+        Thread.sleep(100);
+
+        producers.forEach(Producer::shutdown);
     }
 }

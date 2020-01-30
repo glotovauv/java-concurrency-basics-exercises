@@ -13,7 +13,7 @@ class Queue<E> {
         this.list = new LinkedList<>();
     }
 
-    synchronized E take() throws Exception {
+    synchronized E take() throws InterruptedException {
         while (list.isEmpty()) {
             wait();
         }
@@ -25,7 +25,7 @@ class Queue<E> {
         return e;
     }
 
-    synchronized void offer(E e) throws Exception {
+    synchronized void offer(E e) throws InterruptedException {
         while (list.size() == maxSize) {
             wait();
         }
